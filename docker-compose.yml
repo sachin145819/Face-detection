@@ -1,0 +1,73 @@
+# TruthLens — full stack (PostgreSQL + FastAPI/ML backend + nginx/React frontend)
+#
+#   cp .env.example .env
+#   docker compose up --build        ->  http://localhost:8080
+#
+# All values below have sane defaults, so the stack also starts without a .env file.
+
+name: truthlens
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-truthlens}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-truthlens}
+      POSTGRES_DB: ${POSTGRES_DB:-truthlens}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    # Not published to the host by default; see docker-compose.dev.yml for local dev.
+
+  backend:
+    build:
+      context: ./backend
+      args:
+        PRELOAD_MODELS: ${PRELOAD_MODELS:-true}
+    image: truthlens-backend:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-truthlens}:${POSTGRES_PASSWORD:-truthlens}@db:5432/${POSTGRES_DB:-truthlens}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-change-me}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      STORAGE_DIR: /app/storage
+      MODEL_CACHE_DIR: /app/models_cache
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-10}
+      MAX_VIDEO_MB: ${MAX_VIDEO_MB:-100}
+      VIDEO_MAX_FRAMES: ${VIDEO_MAX_FRAMES:-16}
+      ML_ENABLE_DEEP: ${ML_ENABLE_DEEP:-true}
+      UVICORN_WORKERS: ${UVICORN_WORKERS:-1}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+    volumes:
+      - storage:/app/storage
+      - models_cache:/app/models_cache
+    ports:
+      # Exposed for Swagger (/docs) and direct API access; bound to localhost only.
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    image: truthlens-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      BACKEND_UPSTREAM: backend:8000
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  pgdata:
+  storage:
+  models_cache:

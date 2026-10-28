@@ -1,0 +1,11 @@
+# TruthLens ML pipeline dependencies (owned by the ML part).
+# CPU wheels are fine; do not pin a CUDA build of torch.
+numpy>=1.26,<3
+opencv-python-headless>=4.9
+pillow>=10.0
+scipy>=1.11
+torch>=2.2
+torchvision>=0.17
+transformers>=4.44,<5
+huggingface_hub>=0.24
+safetensors>=0.4

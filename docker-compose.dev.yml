@@ -1,0 +1,30 @@
+# Local development helper: runs ONLY PostgreSQL and publishes it on the host, so the
+# backend can run natively (uvicorn --reload) against a real Postgres instead of SQLite.
+#
+#   docker compose -f docker-compose.dev.yml up -d
+#   export DATABASE_URL=postgresql+psycopg://truthlens:truthlens@localhost:5432/truthlens
+#
+# (`make db-up` / `make db-down` wrap these commands.)
+
+name: truthlens-dev
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-truthlens}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-truthlens}
+      POSTGRES_DB: ${POSTGRES_DB:-truthlens}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  pgdata_dev:

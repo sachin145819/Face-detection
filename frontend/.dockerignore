@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.vite/
+.env
+.env.*
+npm-debug.log*
+Dockerfile
+.dockerignore
+nginx.conf.bak
+.DS_Store
+coverage/

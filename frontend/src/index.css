@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body {
+    @apply bg-slate-50 text-slate-700 font-sans antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  h1, h2, h3, .font-display { @apply font-semibold tracking-tight; }
+  .font-serif { letter-spacing: -0.02em; }
+  :focus-visible { @apply outline-none ring-2 ring-cyan-500 ring-offset-2 ring-offset-white; }
+  .dark-surface :focus-visible { @apply ring-offset-navy-900; }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex h-9 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3.5 text-sm font-medium transition-colors
+      disabled:pointer-events-none disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2;
+  }
+  .btn-primary { @apply btn bg-cyan-600 text-white shadow-sm hover:bg-cyan-700; }
+  .btn-violet { @apply btn bg-violet-600 text-white shadow-sm hover:bg-violet-700; }
+  .btn-dark { @apply btn bg-slate-900 text-white shadow-sm hover:bg-slate-800; }
+  .btn-outline { @apply btn border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900; }
+  .btn-ghost { @apply btn text-slate-600 hover:bg-slate-100 hover:text-slate-900; }
+  .btn-danger { @apply btn bg-red-600 text-white shadow-sm hover:bg-red-700; }
+  .card { @apply rounded-xl border border-slate-200 bg-white shadow-card; }
+  .input {
+    @apply block h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 shadow-sm
+      placeholder:text-slate-400 transition focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/15;
+  }
+  .input-error { @apply border-red-400 focus:border-red-500 focus:ring-red-500/15; }
+  .label { @apply mb-1.5 block text-sm font-medium text-slate-700; }
+  .section-title { @apply text-base font-semibold tracking-tight text-slate-900; }
+  .skeleton { @apply animate-pulse rounded-lg bg-slate-200/70; }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(148,163,184,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,163,184,0.07) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .checker {
+    background-color: #f1f5f9;
+    background-image:
+      linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+      linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+      linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  }
+}
